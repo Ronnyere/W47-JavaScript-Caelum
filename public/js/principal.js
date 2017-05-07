@@ -51,32 +51,36 @@ $(".novoCartao").submit(function(event){
     var	campoConteudo	=	$(".novoCartao-conteudo");
 
     var	conteudo	=	campoConteudo.val().trim()
-                                           .replace(/\n/g,	"<br>");
+        .replace(/\n/g,	"<br>");
 
     //cria os elementos do cartão e	adiciona no	DOM
     if	(conteudo){
 
-        //soma um no contador
         contador++;
 
-        //cria o botão	de remover
         var	botaoRemove	=	$("<button>").addClass("opcoesDoCartao-remove")
+            .attr("data-ref",	contador)
             .text("Remover")
             .click(removeCartao);
-
-        //cria a div de	opcoes
-        var	opcoes	=	$("<div>").addClass("opcoesDoCartao")
-            .append(botaoRemove);
 
         var	conteudoTag	=	$("<p>").addClass("cartao-conteudo")
             .append(conteudo);
 
-        //acrescenta o append para colocar a div opcoes	no cartão
-        $("<div>").addClass("cartao")
+        var	opcoes	=	$("<div>").addClass("opcoesDoCartao")
+            .append(botaoRemove);
+
+        //	**código novo** chamada	para nova função
+        var	tipoCartao	=	decideTipoCartao(conteudo);
+
+        //	**código novo**	adicionando	classe no novo cartão
+        $("<div>").attr("id","cartao_"	+	contador)
+            .addClass("cartao")
+            .addClass(tipoCartao)
             .append(opcoes)
             .append(conteudoTag)
             .prependTo(".mural");
     }
+
     //apaga	o conteúdo do textarea
     campoConteudo.val("");
 });
@@ -95,7 +99,7 @@ function	decideTipoCartao(conteudo){
 
     var	tamMaior	=	ultimoMaior.length;
 
-    //no mínimo,todoCartão	tem	o texto	pequeno
+    //no mínimo,todoCartão tem o texto pequeno
     var	tipoCartao	=	"cartao--textoPequeno";
 
     if	(tamMaior	<	9	&&	quebras	<	5	&&	totalDeLetras	<	55)	{
@@ -105,3 +109,22 @@ function	decideTipoCartao(conteudo){
     }
     return	tipoCartao;
 }
+
+
+$("#busca").on("input",	function(){
+
+    //guarda o valor digitado, removendo espaços extras.
+    var	busca	=	$(this).val().trim();
+    if(busca.length){
+        $(".cartao").hide().filter(function(){
+            return	$(this).find(".cartao-conteudo")
+                           .text()
+                           .match(new	RegExp(busca,	"i"));
+        }).show();
+
+    }else{
+
+        $(".cartao").show();
+     }
+
+});
